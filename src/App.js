@@ -2,6 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import Header from './components/Header';
 import Formulario from './components/Formulario';
 import Clima from './components/Clima';
+import Error from './components/Error';
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
   });
   const [consultar, setConsultar] = useState(false);
   const [resultado, setResultado] = useState({});
+  const [error, setError] = useState(false);
 
   // EXTRACCIONES
   const { ciudad, pais } = busqueda;
@@ -28,17 +30,31 @@ function App() {
         //console.log(resultado);
         setResultado(resultado);
         setConsultar(false);
+
+        //Detecta si existe la ciudad en la API
+        if (resultado.cod === "404") {
+          setError(true);
+        } else {
+          setError(false);
+        }
+
       }
     }
     consultarAPI();
   }, [consultar]);
+
+  let componente;
+  if (error) {
+    componente = <Error mensaje="No hay resultados" />
+  } else {
+    componente = <Clima resultado={resultado} />
+  }
 
   return (
     <Fragment>
       <Header
         titulo='Clima React App'
       />
-
       <div className="contenedor-form">
         <div className="container">
           <div className="row">
@@ -50,9 +66,7 @@ function App() {
               />
             </div>
             <div className="col m6 s12">
-              <Clima
-                resultado={resultado}
-              />
+              {componente}
             </div>
           </div>
         </div>
